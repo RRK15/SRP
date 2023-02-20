@@ -1,0 +1,1 @@
+#Blank script for the RNA seq analysis
