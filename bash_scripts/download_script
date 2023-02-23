@@ -1,0 +1,6 @@
+#!/bin/bash
+for acc in $(cat /home/sjb176/SRP/bash_scripts/SRR_Acc_List.txt)
+do 
+    /home/sjb176/SRA/sratoolkit.3.0.2-ubuntu64/bin/fastq-dump $acc --split-files --outdir /home/SRP/testing
+done < "/home/sjb176/SRP/bash_scripts/SRR_Acc_List.txt"
+
