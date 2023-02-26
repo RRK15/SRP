@@ -1,8 +1,0 @@
-#!/bin/bash
-for file in /scratch/spectre/d/drt15/SRP/output/*_[1,2].fastq; do
-    perl /scratch/spectre/d/drt15/SRP/prinseq_test/prinseq-lite-0.20.4/prinseq-lite.pl -fastq $file -min_len 30 -trim_left 10 -trim_qual_right 25 -lc_method entropy -lc_threshold 65 -out_format 3 -out_good /scratch/spectre/d/drt15/SRP/prinseq_test/results/
-    	
-
-done
-
-
