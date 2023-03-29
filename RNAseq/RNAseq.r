@@ -1,6 +1,15 @@
+#PUT THIS INTO R TERMINAL TO INSTALL SCDE
+
+#require(devtools)
+#devtools::install_version('flexmix', '2.3-13')
+#devtools::install_github('hms-dbmi/scde', build_vignettes = FALSE)
+
+
 library(scde)
 library(parallel)
-#Following the tutorial for SCDE 
+#Following the tutorial for SCDE
+
+
 dir <- "data/transformed_data.csv"
 #Needs to have it read the row names in or it doesnt fcking work
 seq_data <- read.csv(dir, row.names = "Gene_Id")
@@ -43,4 +52,4 @@ dl <- mclapply(1:n.simulations,function(i) {
 #I think these are the distances we need for the next step
 direct.dist <- as.dist(1-Reduce("+",dl)/length(dl))
 mydf<-as.data.frame(as.matrix(direct.dist))
-write.csv(mydf,file = "filename.csv")
+write.csv(mydf,file = "distance_matrix.csv")
