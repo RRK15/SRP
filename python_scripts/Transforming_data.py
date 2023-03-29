@@ -20,5 +20,5 @@ for column in df:
 
 
 #save new dataframe
-file_name=f"Transformed_data.csv"
+file_name="../RNAseq/data/transformed_data.csv"
 df.to_csv(file_name, index=False)
