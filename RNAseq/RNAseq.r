@@ -36,9 +36,15 @@ valid.cells <- orig_model$corr.a > 0
 orig_model <- orig_model[valid.cells,]
 #Again, no idea what the fuck this is doing
 #Also do not run this past 1 core
+
+#Avoid calculation if the distance matrix already exists
+#If you want to run this block, delete the distance_matrix.csv in the data folder
 if (file.exists("data/distance_matrix.csv"))
   {
-  print("Distance_matrix file already exists")
+  distance_matrix <- read.csv("data/distance_matrix.csv", row.names = "X")
+  #replace all nans with 0
+  distance_matrix[is.na(distance_matrix)] <- 0
+  distance_matrix <- as.matrix(distance_matrix)
 } else 
   {
   p.self.fail <- scde.failure.probability(models = orig_model, counts = cleaned)
@@ -57,7 +63,14 @@ if (file.exists("data/distance_matrix.csv"))
   }, mc.cores = 1)
   #I think these are the distances we need for the next step
   direct.dist <- as.dist(1-Reduce("+",dl)/length(dl))
-  mydf<-as.data.frame(as.matrix(direct.dist))
-  write.csv(mydf,file = "distance_matrix.csv")
-}
+  distance_matrix<-as.data.frame(as.matrix(direct.dist))
+  #replace all nans with 0
+  distance_matrix[is.na(distance_matrix)] <- 0
+  write.csv(distance_matrix,file = "distance_matrix.csv")
+  distance_matrix <- as.matrix(direct.dist)
+  }
 
+#WHO KNOWS WHAT THE FUCK THIS IS DOING
+normalised_distance = normalize_input(distance_matrix)
+output_tsne <- Rtsne(normalised_distance, theta = 0.0)
+needed_output <- as.data.frame(output_tsne$Y)
