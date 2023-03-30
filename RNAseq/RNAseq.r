@@ -7,7 +7,8 @@
 
 library(scde)
 library(parallel)
-library(Rtsne )
+library(Rtsne)
+library(mclust)
 #Following the tutorial for SCDE
 
 
@@ -74,3 +75,12 @@ if (file.exists("data/distance_matrix.csv"))
 normalised_distance = normalize_input(distance_matrix)
 output_tsne <- Rtsne(normalised_distance, theta = 0.0)
 needed_output <- as.data.frame(output_tsne$Y)
+
+#Holy FUCK why did they have some options that were capitalised and some not
+#It took me like 10 minutes to figur eout where i was going wrong
+clustering <- Mclust(needed_output)
+
+#Neat clusters thank you mclust
+plot(clustering, what= "classification")#the higher the curve the better - VEV, CLUSTER
+#Something about optimal clusters idk
+plot(clustering, what ="BIC", xlab = "Number of Components")
