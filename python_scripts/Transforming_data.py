@@ -17,7 +17,7 @@ for column in df:
         df[column]= np.where(df[column] > 0,  np.log10((df[column] / summation) * 1000000), df[column]) #normalising
         df[column]=df[column].round()
         df[column]=df[column].astype(int)
-
+        df[column]= np.where(df[column] < 0, 0, df[column])
 
 #save new dataframe
 file_name="../RNAseq/data/transformed_data.csv"
