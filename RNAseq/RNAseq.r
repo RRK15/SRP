@@ -27,14 +27,21 @@ cleaned <- clean.counts(seq_data, min.lib.size=1000, min.reads = 1, min.detected
 #May be worth looking into saving the model when ran
 #Also I have no idea what this does
 #SOMETIMES THE MODEL JUST RANDOMLY FUCKS UP WHY
-orig_model <- scde.error.models(counts = cleaned, n.cores = 2, 
-                                threshold.segmentation = TRUE, 
-                                save.crossfit.plots = FALSE, 
-                                save.model.plots = FALSE, 
-                                verbose = 1)
+if (file.exists("data/model.csv"))
+  {
+  orig_model <- read.csv("data/model.csv", row.names = "X")
+} else{
+  orig_model <- scde.error.models(counts = cleaned, n.cores = 2, 
+                                  threshold.segmentation = TRUE, 
+                                  save.crossfit.plots = FALSE, 
+                                  save.model.plots = FALSE, 
+                                  verbose = 1)
+  
+  valid.cells <- orig_model$corr.a > 0
+  orig_model <- orig_model[valid.cells,]
+  write.csv(as.data.frame(orig_model),"data/model.csv")
+}
 
-valid.cells <- orig_model$corr.a > 0
-orig_model <- orig_model[valid.cells,]
 #Again, no idea what the fuck this is doing
 #Also do not run this past 1 core
 
