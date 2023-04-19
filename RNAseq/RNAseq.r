@@ -93,8 +93,14 @@ needed_output <- as.data.frame(output_tsne$Y)
 #Holy FUCK why did they have some options that were capitalised and some not
 #It took me like 10 minutes to figur eout where i was going wrong
 clustering <- Mclust(needed_output)
-
+output_tsne$mclust = factor(clustering$classification)
+tsne1 = output_tsne$Y[,1]
+tsne2 = output_tsne$Y[,2]
+testing = data.frame(tsne1, tsne2)
+testing$mclust = factor(clustering$classification)
+plot_ly(testing, x = ~tsne1, y = ~tsne2, color = ~mclust)
 #Neat clusters thank you mclust
 plot(clustering, what= "classification")
+
 #Something about optimal clusters idk
 plot(clustering, what ="BIC", xlab = "Number of Components")
