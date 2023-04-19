@@ -1,8 +1,7 @@
 # Load required packages
 library(Seurat)
-library(dplyr)
-library(patchwork)
-library(Matrix)
+library(plotly)
+library(ggplot2)
 
 # Read in gene expression data
 raw_counts <- read.csv("data/transformed_data.csv", row.names = "Gene_Id")
@@ -65,8 +64,25 @@ head(Idents(mydata), 5)
 # reticulate::py_install("umap-learn")
 
 # Perform UMAP dimensionality reduction and visualize the results
-mydata <- RunUMAP(mydata, dims = 1:10)
+mydata <- RunUMAP(mydata, dims = 1:10, n.components = 3L)
 DimPlot(mydata, reduction = "umap", label = TRUE)
+
+##### tried using plotly ######
+plot1 <- ggplotly(
+  DimPlot(
+    mydata, 
+    reduction = "umap", 
+    label = TRUE
+  ) + 
+    ggtitle("UMAP Plot") +
+    theme(
+      plot.title = element_text(size = 14, face = "bold"),
+      axis.title = element_text(size = 12, face = "bold"),
+      axis.text = element_text(size = 10)
+    )
+)
+plot1
+
 
 # Same thing if want to try tsne
 # mydata <- RunTSNE(mydata)
@@ -100,18 +116,26 @@ DoHeatmap(mydata, features = top10$gene)
 # Plot the single marker in UMAP
 FeaturePlot(object = mydata, features = "GAD1", pt.size = 0.5, combine = TRUE)
 
-# same thing but a bit different
-library(ggplot2)
-
-FeaturePlot(mydata, features = "GAD1", pt.size = 0.5) +
+###### plotly version ######
+ggplotly(
+  FeaturePlot(mydata, features = "GAD1", pt.size = 0.5) +
   ggtitle("GAD1 expression in UMAP") +
   theme(plot.title = element_text(size = 14, face = "bold"),
         axis.title = element_text(size = 12, face = "bold"),
         axis.text = element_text(size = 10))
+)
 
 # creating a violin plot for single marker
 VlnPlot(mydata, features = "GAD1")
 
+####### plotly version #########
+ggplotly(
+  VlnPlot(mydata, features = "GAD1") + 
+  ggtitle("GAD1 expression")
+)
+
+# same thing but a bit different(it's a feature plot in seurat can convert into ggplot but not into plotly)
+RidgePlot(mydata, features = "GAD1")
 
 
 ###### just ignore this #######
