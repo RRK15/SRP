@@ -1,0 +1,6 @@
+#!/bin/bash
+for file in *[good,bad]*.fastq; do
+
+	perl /scratch/spectre/d/drt15/SRP/FastQC/fastqc $file --extract
+
+done

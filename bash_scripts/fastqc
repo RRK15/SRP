@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Make a new directory to store the FastQC results
+mkdir fastqc_results
+
+# Loop over all FASTQ files in the current directory
+for file in *.fastq
+do
+  # Run FastQC on the file and save the results to the fastqc_results directory
+  fastqc -o fastqc_results $file
+done
+
