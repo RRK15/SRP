@@ -65,6 +65,20 @@ head(Idents(mydata), 5)
 
 # Perform UMAP dimensionality reduction and visualize the results
 mydata <- RunUMAP(mydata, dims = 1:10, n.components = 3L)
+umap_df <- as.data.frame(mydata@reductions$umap@cell.embeddings)
+umap_df$clusters <- Idents(mydata)
+
+
+set.seed(0)
+##### normal umap #####
+fig1 <- plot_ly(data = umap_df, x = ~UMAP_1, y = ~UMAP_2, type = 'scatter', color = ~clusters, mode = 'markers')
+###3d plot#####
+fig2 <- plot_ly(data = umap_df, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, color = ~clusters, mode = 'markers') %>% add_markers(size = 8)
+
+fig1
+fig2
+
+
 DimPlot(mydata, reduction = "umap", label = TRUE)
 
 ##### tried using plotly ######
