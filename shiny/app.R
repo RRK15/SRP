@@ -7,6 +7,9 @@ library(mclust)
 library(Rtsne)
 
 testdata <- read.csv("cluster_genes.csv")
+metadata <- read.csv("SraRunTableMod.csv", row.names = 1)
+features <-subset(metadata, select = c(Cell_type))
+
 distance_matrix <- read.csv("distance_matrix.csv", row.names = "X")
 #replace all nans with 0
 distance_matrix[is.na(distance_matrix)] <- 0
@@ -17,7 +20,8 @@ needed_output <- as.data.frame(output_tsne$Y)
 clustering <- Mclust(needed_output)
 tsne1 = output_tsne$Y[,1]
 tsne2 = output_tsne$Y[,2]
-testing = data.frame(tsne1, tsne2)
+combin = data.frame(tsne1, tsne2)
+testing <- cbind(combin, features)
 testing$mclust = factor(clustering$classification)
 
 
@@ -39,9 +43,18 @@ server <- function(input, output) {
     
   })
   output$mclustplot <- renderPlotly({
-    p <- plot_ly(testing, x = ~tsne1, y = ~tsne2, source = "testing", color = ~mclust,colors = "Set3",
+    plot_ly(testing, x = ~tsne1, y = ~tsne2, 
+            color = ~Cell_type,
+            colors = "Set3",
+            type = "scatter",
+            mode = "markers",
+            source = "testing",
             customdata = ~mclust,
-            text = ~paste("Cluster ID:", mclust))
+            legend = FALSE,
+            text = ~paste("Cluster ID:", mclust, 
+                          "<br>Cell Type:", Cell_type),
+            hoverinfo = "text")
+    
   })
   
  
