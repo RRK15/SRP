@@ -69,6 +69,12 @@ mydata <- RunUMAP(mydata, dims = 1:10, n.components = 3L)
 umap_df <- as.data.frame(mydata@reductions$umap@cell.embeddings)
 umap_df$clusters <- Idents(mydata)
 
+# now saving the seurat object in RDS format(only use this when need to save)
+#saveRDS(mydata, file = "data/mydata.rds")
+
+# read this RDS format
+#mydata <- readRDS("data/mydata.rds")
+
 set.seed(0)
 
 ########### unbiased approach coloured based on umap clustering ############
@@ -85,7 +91,7 @@ fig2
 features <-subset(metadata, select = c(Cell_type))
 pbd <- cbind(umap_df, features)
 
-fig3 <- plot_ly(data = pbd, x = ~UMAP_1, y = ~UMAP_2, type = 'scatter', color = ~Cell_type, mode = 'markers')
+fig3 <- plot_ly(data = pbd, x = ~UMAP_1, y = ~UMAP_2, type = 'scatter', color = ~Cell_type, mode = 'markers',  text = ~paste("Cluster ID:", clusters,"<br>Cell Type:", Cell_type))
 fig4 <- plot_ly(data = pbd, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, color = ~Cell_type, mode = 'markers') %>% add_markers(size = 8)
 
 fig3
