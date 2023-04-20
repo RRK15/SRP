@@ -1,5 +1,6 @@
 # Load required packages
 library(Seurat)
+library(dplyr)
 library(plotly)
 library(ggplot2)
 
@@ -68,17 +69,31 @@ mydata <- RunUMAP(mydata, dims = 1:10, n.components = 3L)
 umap_df <- as.data.frame(mydata@reductions$umap@cell.embeddings)
 umap_df$clusters <- Idents(mydata)
 
-
 set.seed(0)
-##### normal umap #####
+
+########### unbiased approach coloured based on umap clustering ############
+# normal umap #
 fig1 <- plot_ly(data = umap_df, x = ~UMAP_1, y = ~UMAP_2, type = 'scatter', color = ~clusters, mode = 'markers')
 ###3d plot#####
 fig2 <- plot_ly(data = umap_df, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, color = ~clusters, mode = 'markers') %>% add_markers(size = 8)
 
 fig1
 fig2
+############################################
 
+############ biased approach coloured based on given metadata celltype ###########
+features <-subset(metadata, select = c(Cell_type))
+pbd <- cbind(umap_df, features)
 
+fig3 <- plot_ly(data = pbd, x = ~UMAP_1, y = ~UMAP_2, type = 'scatter', color = ~Cell_type, mode = 'markers')
+fig4 <- plot_ly(data = pbd, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, color = ~Cell_type, mode = 'markers') %>% add_markers(size = 8)
+
+fig3
+fig4
+
+############################################
+
+# Seurat Dimention plot
 DimPlot(mydata, reduction = "umap", label = TRUE)
 
 ##### tried using plotly ######
@@ -133,10 +148,10 @@ FeaturePlot(object = mydata, features = "GAD1", pt.size = 0.5, combine = TRUE)
 ###### plotly version ######
 ggplotly(
   FeaturePlot(mydata, features = "GAD1", pt.size = 0.5) +
-  ggtitle("GAD1 expression in UMAP") +
-  theme(plot.title = element_text(size = 14, face = "bold"),
-        axis.title = element_text(size = 12, face = "bold"),
-        axis.text = element_text(size = 10))
+    ggtitle("GAD1 expression in UMAP") +
+    theme(plot.title = element_text(size = 14, face = "bold"),
+          axis.title = element_text(size = 12, face = "bold"),
+          axis.text = element_text(size = 10))
 )
 
 # creating a violin plot for single marker
@@ -145,7 +160,7 @@ VlnPlot(mydata, features = "GAD1")
 ####### plotly version #########
 ggplotly(
   VlnPlot(mydata, features = "GAD1") + 
-  ggtitle("GAD1 expression")
+    ggtitle("GAD1 expression")
 )
 
 # same thing but a bit different(it's a feature plot in seurat can convert into ggplot but not into plotly)
