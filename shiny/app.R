@@ -49,8 +49,9 @@ ui <- dashboardPage(
              box(plotlyOutput("mclustplot"), width = NULL)
       ),
       column(width = 4,
-             box("Top 10 enriched genes in cluster:",uiOutput("PLS"), width = NULL),
-             
+             box("Top 10 enriched genes in cluster:",uiOutput("origclust"), width = NULL),
+             box(textInput("origquerygene",label = "Query a gene"), width = NULL),
+             box(textOutput("origgeneoutput"), width = NULL)
       )
     )
   ),
@@ -119,8 +120,8 @@ server <- function(input, output) {
       highlight(on = "plotly_hover", off = "plotly_doubleclick")
     
   })
-  output$PLS <- renderUI({
-    testdata[val(),]
+  output$origclust <- renderUI({
+    origclust[val(),]
   })
   
   querytest <- reactive({
@@ -135,8 +136,23 @@ server <- function(input, output) {
     }
   })
   
+  origquerytest <- reactive({
+    req(input$origquerygene)
+    grepstuff = grep(input$origquerygene, origclust$Genes)
+    print(grepstuff)
+    if (identical(grepstuff, integer(0))){
+      print("No genes found")
+      
+    }else{
+      results = paste(grep(input$origquerygene, origclust$Genes), collapse = " ")
+      paste("Genes found in clustert(s):",results, collapse = " ")
+    }
+  })
   output$geneoutput <- renderText({
     querytest()
+  })
+  output$origgeneoutput <- renderText({
+    origquerytest()
   })
 } 
 
