@@ -7,7 +7,7 @@ library(mclust)
 library(Rtsne)
 
 
-
+origclust <- read.csv("data/origtop.csv")
 altclust <- read.csv("data/cluster_genes.csv")
 
 metadata <- read.csv("data/SraRunTableMod.csv", row.names = 1)
