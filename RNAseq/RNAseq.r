@@ -13,12 +13,19 @@ library(scde)
 library(parallel)
 library(Rtsne)
 library(mclust)
+library(FactoMineR)
+library(factoextra)
+library(plotly)
 #Following the tutorial for SCDE
 
-
+metadata <- read.csv("data/SraRunTableMod.csv", row.names = 1)
+features_cell <-subset(metadata, select = c(Cell_type))
 dir <- "data/transformed_data.csv"
  #Needs to have it read the row names in or it doesnt fcking work
+
 seq_data <- read.csv(dir, row.names = "Gene_Id")
+test_data <- read.csv(dir)
+
 #Convert all non gene columns to numeric
 seq_data[,1:466] <- sapply(seq_data[,1:466], as.integer)
 
@@ -89,18 +96,33 @@ if (file.exists("data/distance_matrix.csv"))
 normalised_distance = normalize_input(distance_matrix)
 output_tsne <- Rtsne(normalised_distance, theta = 0.0)
 needed_output <- as.data.frame(output_tsne$Y)
+tsne1 <- output_tsne$Y[,1]
+tsne2 <- output_tsne$Y[,2]
+clust <- data.frame(tsne1, tsne2)
+testing <- cbind(clust, features_cell)
 
 #Holy FUCK why did they have some options that were capitalised and some not
 #It took me like 10 minutes to figur eout where i was going wrong
+
 clustering <- Mclust(needed_output)
-output_tsne$mclust = factor(clustering$classification)
-tsne1 = output_tsne$Y[,1]
-tsne2 = output_tsne$Y[,2]
-testing = data.frame(tsne1, tsne2)
-testing$mclust = factor(clustering$classification)
-plot_ly(testing, x = ~tsne1, y = ~tsne2, color = ~mclust)
+testing$mclust <- clustering$classification
+
+plot_ly(testing,
+        x = ~tsne1, y = ~tsne2, 
+        color = ~Cell_type,
+        colors = "Set3",
+        type = "scatter",
+        mode = "markers",
+        customdata = ~mclust,
+        text = ~paste("Cluster ID:", mclust, 
+                      "<br>Cell Type:", Cell_type),
+        hoverinfo = "text")
+
 #Neat clusters thank you mclust
 plot(clustering, what= "classification")
-
 #Something about optimal clusters idk
 plot(clustering, what ="BIC", xlab = "Number of Components")
+ncol(seq_data)
+#FactoMineR
+res.pca <- PCA(needed_output, ncp = 3, graph = TRUE)
+fviz_pca_ind(res.pca, axes = c(1,2), geom.ind = "point", palette = c("green", "purple", "black"))
