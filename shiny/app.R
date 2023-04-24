@@ -45,24 +45,24 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "originalpipeline",
     fluidRow(
-      column(width = 8,
-             box(plotlyOutput("mclustplot"), width = NULL)
+      column(h3("Results for the original pipeline"), width = 8,
+             box(h5("Hover over the clusters in the graph to see their cluster ID and cell type. On the pannel on the right, there is a list of the different cell types which can be clicked on to hide or show them on the graph. If a dot on the graph is selected, their cell types will appear at the end of the list of the pannel on the right. "), plotlyOutput("mclustplot"), width = NULL)
       ),
       column(width = 4,
-             box("Top 10 enriched genes in cluster:",uiOutput("origclust"), width = NULL),
-             box(textInput("origquerygene",label = "Query a gene"), width = NULL),
+             box("Select a cluster in the graph to see the top 10 enriched genes.",uiOutput("origclust"), width = NULL),
+             box(textInput("origquerygene",label = "Type the name of a gene to see in which clusters it appears."), width = NULL),
              box(textOutput("origgeneoutput"), width = NULL)
       )
     )
   ),
       tabItem(tabName = "alternatepipeline",
         fluidRow(
-          column(width = 8,
-              box(plotlyOutput("alternateplot"), width = NULL)
+          column(h3("Results for the alternative pipeline"), width = 8,
+              box(h5("Hover over the clusters in the graph to see their cluster ID and cell type. On the pannel on the right, there is a list of the different cell types which can be clicked on to hide or show them on the graph. If a dot on the graph is selected, their cell types will appear at the end of the list of the pannel on the right. "), plotlyOutput("alternateplot"), width = NULL)
           ),
           column(width = 4,
-              box("Top 10 enriched genes in cluster:", uiOutput("altclust"), width = NULL),
-              box(textInput("querygene",label = "Query a gene"), width = NULL),
+              box("Select a cluster in the graph to see the top 10 enriched genes.", uiOutput("altclust"), width = NULL),
+              box(textInput("querygene",label = "Type the name of a gene to see in which clusters it appears"), width = NULL),
               box(textOutput("geneoutput"), width = NULL)
           )
         )
