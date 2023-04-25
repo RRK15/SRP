@@ -47,12 +47,7 @@ ui <- dashboardPage(
                 column(width = 12,align = "center",
                        titlePanel("Group A submission")
                 ),
-              box("In 2015 a study was carried out by Darmanis to attempt to build a brain cell atlas.
-              Cell samples were obtained from the brain, from which single cell transcriptomic analysis was performed.
-              The following is an interactive site that allows for the visualization of the reanalysis. 
-                Two analyses were carried out. The first was the recreation of the author's original pipeline, using SCDE, Rtsne, Mclust and FactoMineR, 
-                followed by the outcome of implementing an alternative pipeline using Seurat. Through the analysis, the cells were clustered according to their molecular signatures. 
-                  Both versions display the found clusters in the data as well as the top ten genes in those clusters and their predicted cell type", width = 12),
+              verbatimTextOutput("welcometext"),
               titlePanel("Instructions for site use:"),
               verbatimTextOutput("instructiontext")
       )
@@ -179,6 +174,15 @@ server <- function(input, output) {
           "Hovering over a cluster highlights all points within the cluster - double cick to clear",
           "Clicking on a cluster will show the top10 enriched genes for that cluster",
           "Querying a gene is possible by entering it into the search box, this will result in the clusters it is present in as well as additional information", sep = "\n")
+  })
+  output$welcometext <- renderText({
+    paste("In 2015 a study was carried out by Darmanis et al. to attempt to build a brain cell atlas.
+Cell samples were obtained from the brain, from which single cell transcriptomic analysis was performed.
+The following is an interactive site that allows for the visualization of the reanalysis. 
+Two analyses were carried out. The first was the recreation of the author's original pipeline, using SCDE, Rtsne, Mclust and FactoMineR, 
+followed by the outcome of implementing an alternative pipeline using Seurat. Through the analysis, the cells were clustered according to their 
+molecular signatures. Both versions display the found clusters in the data as well as the top ten genes in those clusters and their predicted 
+cell type")
   })
   origreactivegeneinfo <- reactive({
     req(input$origquerygene)
