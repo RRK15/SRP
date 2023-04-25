@@ -15,8 +15,7 @@ features <-subset(metadata, select = c(Cell_type))
 distance_matrix <- read.csv("data/distance_matrix.csv", row.names = "X")
 altdata <- read.csv("data/alternate.csv")
 
-x <- grep("SDPR", geneinfo$Gene)
-print(geneinfo[x,3])
+
 #replace all nans with 0
 distance_matrix[is.na(distance_matrix)] <- 0
 distance_matrix <- as.matrix(distance_matrix)
@@ -48,9 +47,12 @@ ui <- dashboardPage(
                 column(width = 12,align = "center",
                        titlePanel("Group A submission")
                 ),
-              box("In 2015 a study was carried out by Damian in which an attempt was carried out to build a brain cell atlas. Cell samples were obtained from the brain and submitted to a scRNAseq annalysis to study their transcriptomes. 
-
-The following is an interactive site that allows for the visualization of the analysis of the data gathered in PAPER. Two analysis were carried out. The first was the recreation of the author's original pipeline (EXPLAIn), followed by the outcome of implementing an alternative pipeline (EXPLAIN). Through the annalysis, the cells were clustered according to their molecular signatures. Both versions display the found clusters in the data as well as the top ten genes in those clusters and their tissue of origin.", width = 12),
+              box("In 2015 a study was carried out by Darmanis to attempt to build a brain cell atlas.
+              Cell samples were obtained from the brain, from which single cell transcriptomic analysis was performed.
+              The following is an interactive site that allows for the visualization of the reanalysis. 
+                Two analyses were carried out. The first was the recreation of the author's original pipeline, using SCDE, Rtsne, Mclust and FactoMineR, 
+                followed by the outcome of implementing an alternative pipeline using Seurat. Through the analysis, the cells were clustered according to their molecular signatures. 
+                  Both versions display the found clusters in the data as well as the top ten genes in those clusters and their predicted cell type", width = 12),
               titlePanel("Instructions for site use:"),
               verbatimTextOutput("instructiontext")
       )
@@ -161,7 +163,7 @@ server <- function(input, output) {
       
     }else{
       results = paste(grep(uppquery, origclust$Genes), collapse = " ")
-      paste("Genes found in clustert(s):",results, collapse = " ")
+      paste("Genes found in cluster(s):",results, collapse = " ")
     }
   })
   output$geneoutput <- renderText({
@@ -171,7 +173,7 @@ server <- function(input, output) {
     origquerytest()
   })
   output$instructiontext <- renderText({
-    paste("All plots on the site are fully interactive, to interact:",
+    paste("All plots on the site are fully interactive:",
           "Clicking cell types within the plot legend removes them from the plot",
           "Double clicking on a cell type within the plot legend isolates the cell type",
           "Hovering over a cluster highlights all points within the cluster - double cick to clear",
@@ -182,7 +184,7 @@ server <- function(input, output) {
     req(input$origquerygene)
     uppquery <- toupper(input$origquerygene)
     grepinfo <- grep(uppquery, geneinfo$Gene)
-    if (identical(grepinfo, integer(0))){
+    if (is.na(grepinfo)){
       print("No genes found")
       
     }else{
@@ -197,8 +199,9 @@ server <- function(input, output) {
   alternatereactivegeneinfo <- reactive({
     req(input$querygene)
     uppquery <- toupper(input$querygene)
-    grepinfo <- grep(uppquery, geneinfo$Gene)
-    if (identical(grepinfo, integer(0))){
+    grepinfo <- grep(uppquery, geneinfo$Gene)[1]
+    
+    if (is.na(grepinfo)){
       print("No genes found")
       
     }else{
