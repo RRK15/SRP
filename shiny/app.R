@@ -43,10 +43,15 @@ ui <- dashboardPage(
   
   dashboardBody(
     tabItems(
+      tabItem(tabName = "welcome",
+              h4("In 2015 a study was carried out by Damian in which an attempt was carried out to build a brain cell atlas. Cell samples were obtained from the brain and submitted to a scRNAseq annalysis to study their transcriptomes. 
+
+The following is an interactive site that allows for the visualization of the analysis of the data gathered in PAPER. Two analysis were carried out. The first was the recreation of the author's original pipeline (EXPLAIn), followed by the outcome of implementing an alternative pipeline (EXPLAIN). Through the annalysis, the cells were clustered according to their molecular signatures. Both versions display the found clusters in the data as well as the top ten genes in those clusters and their tissue of origin.")
+      ),
       tabItem(tabName = "originalpipeline",
     fluidRow(
       column(h3("Results for the original pipeline"), width = 8,
-             box(h5("Hover over the clusters in the graph to see their cluster ID and cell type. On the pannel on the right, there is a list of the different cell types which can be clicked on to hide or show them on the graph. If a dot on the graph is selected, their cell types will appear at the end of the list of the pannel on the right. "), plotlyOutput("mclustplot"), width = NULL)
+             box(h3("Clusters of genes for original pipelines"), h5("Hover over the clusters in the graph to see their cluster ID and cell type. On the pannel on the right, there is a list of the different cell types which can be clicked on to hide or show them on the graph. If a dot on the graph is selected, their cell types will appear at the end of the list of the pannel on the right. "), plotlyOutput("mclustplot"), width = NULL)
       ),
       column(width = 4,
              box("Select a cluster in the graph to see the top 10 enriched genes.",uiOutput("origclust"), width = NULL),
@@ -58,7 +63,7 @@ ui <- dashboardPage(
       tabItem(tabName = "alternatepipeline",
         fluidRow(
           column(h3("Results for the alternative pipeline"), width = 8,
-              box(h5("Hover over the clusters in the graph to see their cluster ID and cell type. On the pannel on the right, there is a list of the different cell types which can be clicked on to hide or show them on the graph. If a dot on the graph is selected, their cell types will appear at the end of the list of the pannel on the right. "), plotlyOutput("alternateplot"), width = NULL)
+              box(h3("Clusters of genes for alternative pipeline"), h5("Hover over the clusters in the graph to see their cluster ID and cell type. On the pannel on the right, there is a list of the different cell types which can be clicked on to hide or show them on the graph. If a dot on the graph is selected, their cell types will appear at the end of the list of the pannel on the right. "), plotlyOutput("alternateplot"), width = NULL)
           ),
           column(width = 4,
               box("Select a cluster in the graph to see the top 10 enriched genes.", uiOutput("altclust"), width = NULL),
