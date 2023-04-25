@@ -9,14 +9,14 @@ library(Rtsne)
 
 origclust <- read.csv("data/origtop.csv")
 altclust <- read.csv("data/cluster_genes.csv")
-
+geneinfo <- read.csv("data/geneinfo.csv")
 metadata <- read.csv("data/SraRunTableMod.csv", row.names = 1)
 features <-subset(metadata, select = c(Cell_type))
-
 distance_matrix <- read.csv("data/distance_matrix.csv", row.names = "X")
-
 altdata <- read.csv("data/alternate.csv")
 
+x <- grep("SDPR", geneinfo$Gene)
+print(geneinfo[x,3])
 #replace all nans with 0
 distance_matrix[is.na(distance_matrix)] <- 0
 distance_matrix <- as.matrix(distance_matrix)
@@ -63,7 +63,8 @@ The following is an interactive site that allows for the visualization of the an
       column(width = 4,
              box("Select a cluster in the graph to see the top 10 enriched genes.",uiOutput("origclust"), width = NULL),
              box(textInput("origquerygene",label = "Type the name of a gene to see in which clusters it appears."), width = NULL),
-             box(textOutput("origgeneoutput"), width = NULL)
+             box(textOutput("origgeneoutput"), width = NULL),
+             box(textOutput("origgeneinfo"), width= NULL, height = "31vh")
       )
     )
   ),
@@ -75,7 +76,8 @@ The following is an interactive site that allows for the visualization of the an
           column(width = 4,
               box("Select a cluster in the graph to see the top 10 enriched genes.", uiOutput("altclust"), width = NULL),
               box(textInput("querygene",label = "Type the name of a gene to see in which clusters it appears"), width = NULL),
-              box(textOutput("geneoutput"), width = NULL)
+              box(textOutput("geneoutput"), width = NULL),
+              box(textOutput("alternategeneinfo"), width = NULL, height = "31vh")
           )
         )
 )
@@ -175,6 +177,38 @@ server <- function(input, output) {
           "Hovering over a cluster highlights all points within the cluster - double cick to clear",
           "Clicking on a cluster will show the top10 enriched genes for that cluster",
           "Querying a gene is possible by entering it into the search box, this will result in the clusters it is present in as well as additional information", sep = "\n")
+  })
+  origreactivegeneinfo <- reactive({
+    req(input$origquerygene)
+    uppquery <- toupper(input$origquerygene)
+    grepinfo <- grep(uppquery, geneinfo$Gene)
+    if (identical(grepinfo, integer(0))){
+      print("No genes found")
+      
+    }else{
+      genename <- geneinfo[grepinfo,2]
+      genedesc <- geneinfo[grepinfo,3]
+      paste(genename,":", genedesc, sep ="\n")
+    }
+  })
+  output$origgeneinfo <- renderText({
+    origreactivegeneinfo()
+  })
+  alternatereactivegeneinfo <- reactive({
+    req(input$querygene)
+    uppquery <- toupper(input$querygene)
+    grepinfo <- grep(uppquery, geneinfo$Gene)
+    if (identical(grepinfo, integer(0))){
+      print("No genes found")
+      
+    }else{
+      genename <- geneinfo[grepinfo,2]
+      genedesc <- geneinfo[grepinfo,3]
+      paste(genename,":", genedesc, sep ="\n")
+    }
+  })
+  output$alternategeneinfo <- renderText({
+    alternatereactivegeneinfo()
   })
 } 
 
