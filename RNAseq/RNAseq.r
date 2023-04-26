@@ -18,10 +18,10 @@ library(factoextra)
 library(plotly)
 #Following the tutorial for SCDE
 
+#Reads in data
 metadata <- read.csv("data/SraRunTableMod.csv", row.names = 1)
 features_cell <-subset(metadata, select = c(Cell_type))
 dir <- "data/transformed_data.csv"
- #Needs to have it read the row names in or it doesnt fcking work
 
 seq_data <- read.csv(dir, row.names = "Gene_Id")
 test_data <- read.csv(dir)
@@ -29,15 +29,13 @@ test_data <- read.csv(dir)
 #Convert all non gene columns to numeric
 seq_data[,1:466] <- sapply(seq_data[,1:466], as.integer)
 
-#Cleaning counts - no idea what this does tbh 
-#get someone to read into these parameters
+#Clean the data, at least 1000 reads per cell
 cleaned <- clean.counts(seq_data, min.lib.size=1000, min.reads = 1, min.detected = 1)
 
-#This takes a fucking long time to run 
+
 #do NOT run this with 8 cores - crashes laptop
-#May be worth looking into saving the model when ran
-#Also I have no idea what this does
-#SOMETIMES THE MODEL JUST RANDOMLY FUCKS UP WHY
+#Will check to see if the model.csv exists to skip the running in this block
+#Much of this code is repurposed from the SCDE tutorial
 if (file.exists("data/model.csv"))
   {
   orig_model <- read.csv("data/model.csv", row.names = "X")
@@ -53,9 +51,7 @@ if (file.exists("data/model.csv"))
   write.csv(as.data.frame(orig_model),"data/model.csv")
 }
 
-#Again, no idea what the fuck this is doing
-#Also do not run this past 1 core
-
+#Do NOT run this past one core ,my laptop nearly exploded 
 #Avoid calculation if the distance matrix already exists
 #If you want to run this block, delete the distance_matrix.csv in the data folder
 if (file.exists("data/distance_matrix.csv"))
@@ -73,6 +69,10 @@ if (file.exists("data/distance_matrix.csv"))
     scd1 <- do.call(cbind,lapply(cell.names,function(nam) {
       x <- cleaned[,nam]
       # replace predicted drop outs with NAs
+      #Not entirely sure why, but I had to replace the value that was in self.fail
+      #In the tutorial with the number of columns - 1
+      #Fixes it, not sure why
+      #No-one is helping me with this so I am limited with what I can look into 
       x[!as.logical(rbinom(length(x),1,1-p.self.fail[,464]*k))] <- NA;
       x;
     }))
@@ -80,7 +80,7 @@ if (file.exists("data/distance_matrix.csv"))
     # calculate correlation on the complete observation pairs
     cor(log10(scd1+1),use="pairwise.complete.obs");
   }, mc.cores = 1)
-  #I think these are the distances we need for the next step
+  #Get distance matrix
   direct.dist <- as.dist(1-Reduce("+",dl)/length(dl))
   distance_matrix<-as.data.frame(as.matrix(direct.dist))
   #replace all nans with 0
@@ -90,23 +90,24 @@ if (file.exists("data/distance_matrix.csv"))
 }
 
 
-#WHO KNOWS WHAT THE FUCK THIS IS DOING
-#If you don't have this as a matrix it gets EXTREMELy upset and gives you
+#If you don't have this as a matrix it gets EXTREMELY upset and gives you
 #a nonsensical error that isnt actually the problem
+#Normalise the matrix and put it into TSNE
 normalised_distance = normalize_input(distance_matrix)
 output_tsne <- Rtsne(normalised_distance, theta = 0.0)
+#Because the LAMP server doesn't take plotly, have to extract the data manually
 needed_output <- as.data.frame(output_tsne$Y)
 tsne1 <- output_tsne$Y[,1]
 tsne2 <- output_tsne$Y[,2]
+#Binds the extracted data together, second line binds it alongside the cell names
 clust <- data.frame(tsne1, tsne2)
 testing <- cbind(clust, features_cell)
 
-#Holy FUCK why did they have some options that were capitalised and some not
-#It took me like 10 minutes to figur eout where i was going wrong
 
+#Running clustering using mclust
 clustering <- Mclust(needed_output)
 testing$mclust <- clustering$classification
-
+#Have to use plotly because of rendering issues on LAMP
 plot_ly(testing,
         x = ~tsne1, y = ~tsne2, 
         color = ~Cell_type,
@@ -118,11 +119,12 @@ plot_ly(testing,
                       "<br>Cell Type:", Cell_type),
         hoverinfo = "text")
 
-#Neat clusters thank you mclust
+#Mclust clusters
 plot(clustering, what= "classification")
-#Something about optimal clusters idk
+#Optimal number of components
 plot(clustering, what ="BIC", xlab = "Number of Components")
-ncol(seq_data)
+
 #FactoMineR
+#Not sure if we actually need this but its here
 res.pca <- PCA(needed_output, ncp = 3, graph = TRUE)
 fviz_pca_ind(res.pca, axes = c(1,2), geom.ind = "point", palette = c("green", "purple", "black"))
