@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+#PBS -N htseq
+#PBS -l walltime=08:00:00
+#PBS -l vmem=16gb
+#PBS -l nodes=1:ppn=16
+#PBS -m bea
+#PBS -M drt15@student.le.ac.uk
+
+# Set OMP_NUM_THREADS for OpenMP jobs
+export OMP_NUM_THREADS=$PBS_NUM_PPN
+
+
+# Execute the job code
+
+for acc in $(cat /scratch/spectre/d/drt15/SRP/Acc_list_divide/2)
+do 
+    htseq-count -m intersection-nonempty -s no -f bam -r pos /scratch/spectre/d/drt15/SRP/STAR/Allignment_ncbi/$acc/Aligned.sortedByCoord.out.bam /scratch/spectre/d/drt15/SRP/STAR/Index_creation_files/hg19.ncbiRefSeq.gtf > /scratch/spectre/d/drt15/SRP/STAR/Allignment_ncbi/$acc/count.txt
+done 
+

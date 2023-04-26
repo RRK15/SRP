@@ -1,0 +1,2 @@
+- HTSeq_job_divided contains the HTseq counting job split into 8 seperate jobs to reduce time from roughly 40hrs to 5hrs on the HPC,
+- Acc_list_divide contains the SRA accession list divided into 8 equally sized smaller selections for the 8 HTseq jobs to iterate over

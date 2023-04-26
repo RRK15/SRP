@@ -1,0 +1,4 @@
+#!/bin/bash
+grep -rnw 'Adapter Content' /scratch/spectre/d/drt15/SRP/prinseq_test/results/testresnew/SRR*/fastqc_data.txt > report_adapter.txt
+
+
