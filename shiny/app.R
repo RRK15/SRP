@@ -45,55 +45,42 @@ ui <- dashboardPage(
       tabItem(tabName = "welcome",
               fluidRow(
                 column(width = 12,align = "center",
-                       titlePanel("Group A submission")
+                       titlePanel("Group A submission"),
+                       verbatimTextOutput("welcometext"),
+                       titlePanel("Instructions for site use:")
                 ),
-              verbatimTextOutput("welcometext"),
-              titlePanel("Instructions for site use:"),
-              verbatimTextOutput("instructiontext")
+                verbatimTextOutput("instructiontext")
       )
               ),
       tabItem(tabName = "originalpipeline",
     fluidRow(
       column(h3("Results for the original pipeline"), align = "center", width = 8,
-             box(h3("Clusters of genes for original pipelines"), plotlyOutput("mclustplot"), width = NULL)
+             box(h3("Clusters of genes for original pipelines"), plotlyOutput("mclustplot"), checkboxGroupInput("origcheckcluster", label = "Select clusters:", choices = c(1,2,3,4,5,6,7,8,9), inline = TRUE,
+                                                                                                               selected = c(1,2,3,4,5,6,7,8,9)), width = NULL)
              
       ),
       column(width = 4,
              box("Select a cluster in the graph to see the top 10 enriched genes.",uiOutput("origclust"), width = NULL),
-             box(textInput("origquerygene",label = "Type the name of a gene to see in which clusters it appears."), width = NULL),
-             box(textOutput("origgeneoutput"), width = NULL),
-             box(textOutput("origgeneinfo"), width= NULL, height = "31vh")
-      )
-    ),
-    fluidRow(
-      column(width = 6,
-             box(checkboxGroupInput("origcheckcluster", label = "Select clusters:", choices = c(1,2,3,4,5,6,7,8,9), inline = TRUE,
-                                    selected = c(1,2,3,4,5,6,7,8,9)))
+             box(textInput("origquerygene",label = "Type the name of a gene to see in which clusters it appears."), textOutput("origgeneoutput"), textOutput("origgeneinfo"), width = NULL, height = "100vh")
       )
     )
   ),
       tabItem(tabName = "alternatepipeline",
         fluidRow(
-          column(h3("Results for the alternative pipeline"), width = 8,
-              box(h3("Clusters of genes for alternative pipeline"), plotlyOutput("alternateplot"), width = NULL)
+          column(h3("Results for the alternative pipeline"), align = "center", width = 8,
+              box(h3("Clusters of genes for alternative pipeline"), plotlyOutput("alternateplot"), checkboxGroupInput("altcheckcluster", label = "Select clusters:", choices = c(1,2,3,4,5,6,7,8,9), inline = TRUE,
+                                                                                                                     selected = c(1,2,3,4,5,6,7,8,9)), width = NULL)
           ),
           column(width = 4,
               box("Select a cluster in the graph to see the top 10 enriched genes.", uiOutput("altclust"), width = NULL),
-              box(textInput("querygene",label = "Type the name of a gene to see in which clusters it appears"), width = NULL),
-              box(textOutput("geneoutput"), width = NULL),
-              box(textOutput("alternategeneinfo"), width = NULL, height = "31vh")
+              box(textInput("querygene",label = "Type the name of a gene to see in which clusters it appears."), textOutput("geneoutput"), textOutput("alternategeneinfo"), width = NULL, height = "100vh")
           )
-        ),
-        fluidRow(
-          column(width =6,
-                 box(checkboxGroupInput("altcheckcluster", label = "Select clusters:", choices = c(1,2,3,4,5,6,7,8,9), inline = TRUE,
-                                        selected = c(1,2,3,4,5,6,7,8,9)))
           )
         )
 )
 )
 )
-)
+
 
 server <- function(input, output) {
   val = reactiveVal(1)
@@ -184,21 +171,22 @@ server <- function(input, output) {
   })
   output$instructiontext <- renderText({
     paste("All plots on the site are fully interactive:",
-          "Clicking cell types within the plot legend removes them from the plot",
-          "Double clicking on a cell type within the plot legend isolates the cell type",
-          "Number of displayed clusters can be altered through the use of the checkboxes underneath the graph.",
-          "Hovering over a cluster highlights all points within the cluster - double cick to clear",
-          "Clicking on a cluster will show the top10 enriched genes for that cluster",
-          "Querying a gene is possible by entering it into the search box, this will result in the clusters it is present in as well as additional information", sep = "\n")
+          "- Clicking cell types within the plot legend removes them from the plot",
+          "- Double clicking on a cell type within the plot legend isolates the cell type",
+          "- Number of displayed clusters can be altered through the use of the checkboxes underneath the graph.",
+          "- Hovering over a cluster highlights all points within the cluster - double cick to clear",
+          "- Clicking on a cluster will show the top10 enriched genes for that cluster",
+          "- Querying a gene is possible by entering it into the search box, this will result in the clusters it ",
+          "  is present in as well as additional information", sep = "\n")
   })
   output$welcometext <- renderText({
     paste("In 2015 a study was carried out by Darmanis et al. to attempt to build a brain cell atlas.
 Cell samples were obtained from the brain, from which single cell transcriptomic analysis was performed.
 The following is an interactive site that allows for the visualization of the reanalysis. 
-Two analyses were carried out. The first was the recreation of the author's original pipeline, using SCDE, Rtsne, Mclust and FactoMineR, 
-followed by the outcome of implementing an alternative pipeline using Seurat. Through the analysis, the cells were clustered according to their 
-molecular signatures. Both versions display the found clusters in the data as well as the top ten genes in those clusters and their predicted 
-cell type")
+Two analyses were carried out. The first was the recreation of the author's original pipeline, using SCDE,
+Rtsne, Mclust and FactoMineR, followed by the outcome of implementing an alternative pipeline using Seurat.
+Through the analysis, the cells were clustered according to their molecular signatures. Both versions display 
+the found clusters in the data as well as the top ten genes in those clusters and their predicted cell type")
   })
   origreactivegeneinfo <- reactive({
     req(input$origquerygene)
