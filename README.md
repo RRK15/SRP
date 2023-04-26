@@ -1,5 +1,5 @@
 # SRP main repo  
-
+#While the little tab on the right says this is mostly done in Jupyter Notebook, it's not, jupyternotebooks just take up a lot of space. 
   
   Contributors:  
    
