@@ -54,14 +54,21 @@ ui <- dashboardPage(
               ),
       tabItem(tabName = "originalpipeline",
     fluidRow(
-      column(h3("Results for the original pipeline"), width = 8,
+      column(h3("Results for the original pipeline"), align = "center", width = 8,
              box(h3("Clusters of genes for original pipelines"), plotlyOutput("mclustplot"), width = NULL)
+             
       ),
       column(width = 4,
              box("Select a cluster in the graph to see the top 10 enriched genes.",uiOutput("origclust"), width = NULL),
              box(textInput("origquerygene",label = "Type the name of a gene to see in which clusters it appears."), width = NULL),
              box(textOutput("origgeneoutput"), width = NULL),
              box(textOutput("origgeneinfo"), width= NULL, height = "31vh")
+      )
+    ),
+    fluidRow(
+      column(width = 6,
+             box(checkboxGroupInput("origcheckcluster", label = "Select clusters:", choices = c(1,2,3,4,5,6,7,8,9), inline = TRUE,
+                                    selected = c(1,2,3,4,5,6,7,8,9)))
       )
     )
   ),
@@ -75,6 +82,12 @@ ui <- dashboardPage(
               box(textInput("querygene",label = "Type the name of a gene to see in which clusters it appears"), width = NULL),
               box(textOutput("geneoutput"), width = NULL),
               box(textOutput("alternategeneinfo"), width = NULL, height = "31vh")
+          )
+        ),
+        fluidRow(
+          column(width =6,
+                 box(checkboxGroupInput("altcheckcluster", label = "Select clusters:", choices = c(1,2,3,4,5,6,7,8,9), inline = TRUE,
+                                        selected = c(1,2,3,4,5,6,7,8,9)))
           )
         )
 )
@@ -92,6 +105,7 @@ server <- function(input, output) {
   })
   output$mclustplot <- renderPlotly({
     testing %>%
+      subset(mclust %in% input$origcheckcluster) %>%
       highlight_key(~mclust) %>%
       plot_ly(x = ~tsne1, y = ~tsne2, 
               color = ~Cell_type,
@@ -119,6 +133,7 @@ server <- function(input, output) {
   
   output$alternateplot <- renderPlotly({
     altdata %>%
+      subset(clusters %in% input$altcheckcluster) %>%
       highlight_key(~clusters) %>%
       plot_ly(x = ~UMAP_1, y = ~UMAP_2, 
               type = 'scatter', 
@@ -187,7 +202,7 @@ cell type")
   origreactivegeneinfo <- reactive({
     req(input$origquerygene)
     uppquery <- toupper(input$origquerygene)
-    grepinfo <- grep(uppquery, geneinfo$Gene)
+    grepinfo <- grep(uppquery, geneinfo$Gene)[1]
     if (is.na(grepinfo)){
       print("No genes found")
       
