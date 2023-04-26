@@ -186,6 +186,7 @@ server <- function(input, output) {
     paste("All plots on the site are fully interactive:",
           "Clicking cell types within the plot legend removes them from the plot",
           "Double clicking on a cell type within the plot legend isolates the cell type",
+          "Number of displayed clusters can be altered through the use of the checkboxes underneath the graph.",
           "Hovering over a cluster highlights all points within the cluster - double cick to clear",
           "Clicking on a cluster will show the top10 enriched genes for that cluster",
           "Querying a gene is possible by entering it into the search box, this will result in the clusters it is present in as well as additional information", sep = "\n")
